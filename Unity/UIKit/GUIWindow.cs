@@ -20,7 +20,7 @@ namespace EHTool.UIKit {
 
         public virtual void Open()
         {
-            gameObject.SetActive(true);
+            SetOn();
 
             RectTransform rect = gameObject.GetComponent<RectTransform>();
 
