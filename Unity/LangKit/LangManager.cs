@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Xml;
+using System.IO;
+using UnityEngine;
 
 namespace EHTool.LangKit {
 
@@ -9,11 +10,12 @@ namespace EHTool.LangKit {
 
     }
 
-    public interface IEHLangManager { 
-        
+    public interface IEHLangManager : IObservable<IEHLangManager>{
+        public void UpdateData(bool needNotify = true);
+        public void ChangeLang(string lang);
     }
 
-    public class LangManager : Singleton<LangManager>, IEHLangManager, IObservable<IEHLangManager> {
+    public class LangManager : Singleton<LangManager>, IEHLangManager {
         
         private readonly ISet<IObserver<IEHLangManager>> _observers = new HashSet<IObserver<IEHLangManager>>();
 
@@ -36,50 +38,37 @@ namespace EHTool.LangKit {
             } 
         }
 
-        class StringData : XMLNodeReader {
-            public string key;
-            public string value;
-
-            public void Read(XmlNode node)
-            {
-                key = node.Attributes["key"].Value;
-                value = node.Attributes["value"].Value;
-            }
-        }
-
-        IDictionary<string, string> _dic;
-
         string _nowLang = "Kor";
+
+        IDictionaryConnector<string, string> _reader;
+        IDictionary<string, string> _dict;
+
+        public string NowLang => _nowLang;
 
         protected override void OnCreate()
         {
-            _ReadStringFromXml();
+            _dict = new Dictionary<string, string>();
+            _reader = new JsonDictionaryConnector<string, string>();
+            //_reader = new XMLLangPackReade<string, string>();
+            UpdateData();
         }
 
-        private void _ReadStringFromXml()
+        public void UpdateData(bool needNotify = true)
         {
+            IDictionary<string, string> readResult = _reader.ReadData(string.Format("String/{0}", _nowLang));
 
-            _dic = new Dictionary<string, string>();
-            XmlDocument xmlDoc = AssetOpener.ReadXML("String/" + _nowLang);
-
-            if (xmlDoc == null) return;
-
-            XmlNodeList nodes = xmlDoc.SelectNodes("List/Element");
-
-            for (int i = 0; i < nodes.Count; i++)
-            {
-                StringData stringData = new StringData();
-                stringData.Read(nodes[i]);
-
-                _dic.Add(stringData.key, stringData.value);
+            foreach (var element in readResult) {
+                if (_dict.ContainsKey(element.Key)) {
+                    _dict[element.Key] = element.Value;
+                    continue;
+                }
+                _dict.Add(element.Key, element.Value);
             }
 
-        }
-
-        public void UpdateData()
-        {
-            _ReadStringFromXml();
-            _NotifyToObserver();
+            if (needNotify)
+            {
+                _NotifyToObserver();
+            }
 
         }
 
@@ -89,14 +78,48 @@ namespace EHTool.LangKit {
             UpdateData();
         }
 
-        public string GetStringByKey(string key)
+        public string GetStringByKey(string key, bool doAddKey=false)
         {
-
-            if (_dic.TryGetValue(key, out string value))
+            if (_dict.ContainsKey(key))
             {
-                return value;
+                return _dict[key];
             }
+
+            if (doAddKey) {
+                _dict.Add(key, null);
+                AddKey();
+            }
+
             return key;
+
+        }
+
+        void AddKey() {
+
+            if (!Directory.Exists(string.Format("Assets/Resources/{0}/String", _reader.GetDefaultPath())))
+            {
+                return;
+            }
+
+            DirectoryInfo di = new DirectoryInfo(string.Format("Assets/Resources/{0}/String", _reader.GetDefaultPath()));
+            string startLang = NowLang;
+
+            foreach (FileInfo File in di.GetFiles())
+            {
+                if (File.Extension.ToLower().CompareTo(_reader.GetExtensionName()) != 0) continue;
+
+                string name = File.Name.Substring(0, File.Name.Length - _reader.GetExtensionName().Length);
+
+                if (name.CompareTo(NowLang) == 0) continue;
+
+                _nowLang = name;
+                UpdateData(false);
+                _reader.Save(_dict, name);
+            }
+
+            _nowLang = startLang;
+            UpdateData(false);
+            _reader.Save(_dict, NowLang);
 
         }
     }

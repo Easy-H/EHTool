@@ -33,14 +33,13 @@ namespace EHTool.LangKit {
 #if UNITY_EDITOR
         protected override void OnValidate()
         {
-            SetText(_key);
+            _cancellation = LangManager.Instance.Subscribe(this);
             base.OnValidate();
         }
 #endif
         protected override void OnEnable()
         {
             _cancellation = LangManager.Instance.Subscribe(this);
-            SetText(_key);
             base.OnEnable();
         }
 
@@ -54,11 +53,6 @@ namespace EHTool.LangKit {
         {
             _cancellation?.Dispose();
             base.OnDestroy();
-        }
-
-        public void OnLangChanged()
-        {
-            SetText(_key);
         }
 
         public void SetText(string key)
@@ -75,10 +69,10 @@ namespace EHTool.LangKit {
 
         }
 
-        public void Notified() {
-            SetText(_key);
+        public void AddKey()
+        {
+            LangManager.Instance.GetStringByKey(_key, true);
         }
-
 
     }
 }
