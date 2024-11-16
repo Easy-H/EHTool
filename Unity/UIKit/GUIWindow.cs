@@ -6,7 +6,8 @@ namespace EHTool.UIKit {
 
         protected CallbackMethod _setOnEvent;
 
-        public int priority = 0;
+        [SerializeField] private uint priority = 0;
+        public uint Priority => priority;
 
         virtual public void SetOn()
         {
@@ -49,6 +50,10 @@ namespace EHTool.UIKit {
             UIManager.Instance.OpenGUI<GUIWindow>(key);
         }
 
+        public int CompareTo(IGUI other)
+        {
+            return -priority.CompareTo(other.Priority);
+        }
     }
 
 }

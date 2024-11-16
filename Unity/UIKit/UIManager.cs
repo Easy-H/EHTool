@@ -9,17 +9,26 @@ namespace EHTool.UIKit {
         public IGUIFullScreen NowDisplay { get; private set; }
 
         IDictionary<string, string> _dic;
-        IList<IGUIFullScreen> uiStack;
+        IQueue<IGUIFullScreen> uiStack;
+
+        private GUIMessageBox _msgBox;
 
         public void OpenFullScreen(IGUIFullScreen newData)
         {
-            if (NowDisplay != null)
-            {
-                NowDisplay.SetOff();
+            if (NowDisplay != null) {
+                uiStack.Enqueue(NowDisplay);
             }
 
-            uiStack.Add(newData);
+            uiStack.Enqueue(newData);
 
+            IGUIFullScreen tmp = uiStack.Dequeue();
+
+            if (tmp == NowDisplay) {
+                newData?.SetOff();
+                return;
+            }
+
+            NowDisplay?.SetOff();
             NowDisplay = newData;
             NowDisplay.SetOn();
 
@@ -27,23 +36,24 @@ namespace EHTool.UIKit {
 
         public void CloseFullScreen(IGUIFullScreen closeFullScreen)
         {
+            if (NowDisplay != closeFullScreen)
+            {
+                uiStack.Remove(closeFullScreen);
+                return;
+            }
+
             if (uiStack.Count < 1)
                 return;
 
-            uiStack.Remove(closeFullScreen);
-
-            if (NowDisplay == closeFullScreen)
-            {
-                NowDisplay = uiStack[uiStack.Count - 1];
-                NowDisplay.SetOn();
-            }
+            NowDisplay = uiStack.Dequeue();
+            NowDisplay.SetOn();
 
         }
 
         protected override void OnCreate()
         {
             NowDisplay = null;
-            uiStack = new List<IGUIFullScreen>();
+            uiStack = new StablePriorityQueue<IGUIFullScreen>();
 
             IDictionaryConnector<string, string> connector =
                 //new JsonLangPackReader<string, string>();
@@ -57,7 +67,7 @@ namespace EHTool.UIKit {
         void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
             NowDisplay = null;
-            uiStack = new List<IGUIFullScreen>();
+            uiStack = new StablePriorityQueue<IGUIFullScreen>();
 
         }
 
@@ -69,6 +79,16 @@ namespace EHTool.UIKit {
             retGO.GetComponent<IGUI>().Open(callback);
 
             return retGO.GetComponent<T>();
+        }
+
+        public void DisplayMessage(string messageContent)
+        {
+            if (_msgBox == null)
+            {
+                _msgBox = OpenGUI<GUIMessageBox>("MessageBox");
+            }
+
+            _msgBox.SetMessage(messageContent);
         }
 
     }
