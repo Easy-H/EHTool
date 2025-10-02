@@ -45,7 +45,7 @@ EasyH 코드가 실제로 사용된 프로젝트들입니다.
     - Search: BFS, A* 탐색 알고리즘
     - Spline: Hermite 곡선 계산 알고리즘
 
-- ⬡ Unity: Unity 특화 모듈
+- ⬡ Unity: Unity 6 특화 모듈
     - MonoSingleton: 유니티 생명 주기를 포함하는 Singleton 템플릿
     - UIKit: GUIFullScreen, GUIPopUp 구현 완료
     - LangKit: Text, TextMeshPro UI 지원
@@ -60,7 +60,7 @@ EasyH 코드가 실제로 사용된 프로젝트들입니다.
     - AssetOpener: Addressable Asset System을 도입한 구현체
     - ListConnector: Json, XML 파일을 리스트로 변환
     - Search: DFS 탐색 알고리즘 추가
-- ⬡ Unity: Unity 특화 모듈
+- ⬡ Unity: Unity 6 특화 모듈
     - SoundKit: BGM, 효과음 등을 관리하는 기능
     - EffectKit: 게임에 유용한 효과 관리 기능
 - 🎮 Gaming: 게임 로직 특화 모듈
