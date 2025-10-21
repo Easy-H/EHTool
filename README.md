@@ -37,21 +37,35 @@ EasyH 코드가 실제로 사용된 프로젝트들입니다.
 ### ✅ Unity용 EasyH (현재 구현 완료)
 
 - 🎯 Core: 범용 C# 모듈
-    - AssetOpener: Resource를 이용한 구현체
+    - AssetOpener: 레거시 지원을 위한 코드, 유니티 에셋, 텍스트 에셋 로드
     - Singleton: 싱글톤 템플릿
     - Unsubscriber: C# System의 IDisposable 구현체
-    - DictionaryConnector: Json, XML 파일을 딕셔너리로 변환
-    - Queue: StablePriorityQueue, Heap 등 큐 구현체
-    - Search: BFS, A* 탐색 알고리즘
-    - Spline: Hermite 곡선 계산 알고리즘
+    - FileConnector: 텍스트 에셋 접근
+        - UnityFileConnector: Resources를 이용한 유니티 텍스트 에셋 접근
+    - DictionaryConnector: 파일의 내용을 딕셔너리로 변환
+        - Json, XML에 대해 제공
+    - ListConnector: 파일의 내용을 리스트로 변환
+        - Json, XML에 대해 제공
+    - Queue: push, pop을 제공하는 queue
+        - StablePriorityQueue, Heap 등 큐 구현체
+    - Search: 탐색 알고리즘
+        - BFS, A* 탐색 알고리즘
+    - Spline: 곡선 계산 알고리즘
+        - Hermite 곡선 계산 알고리즘
+    - LangKit: 딕셔너리 파일의 언어 키/값 시스템을 이용한 언어 변경 기능
 
 - ⬡ Unity: Unity 6 특화 모듈
+    - SerializableDictionary: 직렬화 가능한 Dictionary
     - MonoSingleton: 유니티 생명 주기를 포함하는 Singleton 템플릿
-    - UIKit: GUIFullScreen, GUIPopUp 구현 완료
+    - UIKit: GUIFullScreen, GUIPopUp로 명명된 UI 관리
     - LangKit: Text, TextMeshPro UI 지원
+
 - 🎮 Gaming: 게임 로직 특화 모듈
-    - Gaming: TurnBased, PathBased 모듈 구현 완료 (네트워크 턴제 시스템 구현 경험)
-    - Inventory: 스택 기반의 인벤토리 구현체
+    - Gaming: 게임 로직과 관련된 구현
+        - TurnBased: 턴제 게임 로직
+        - PathBased: 경로 기반 보드게임 이동 로직
+    - Inventory: 인벤토리 기능
+        - Stacked
 
 ### ⏳ 향후 계획 (To Do)
 
